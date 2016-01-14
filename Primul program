@@ -1,0 +1,380 @@
+/*Creati o aplicatie care sa fie folosita pentru a tine evidenta urmatoarelor informatii
+referitoare la o biblioteca:
+    a. Biblioteca este formata din mai multe carti, care apartin mai multor domenii de interes pentru cititor
+    b. Domeniul de interes se identifica prin cod si nume
+    c. Fiecare carte se identifica prin: cod carte, titlu, autor, editura, an aparitie, pret, cod domeniu
+    d. Fircare cititor se identifica prin: cod cititor, nume, adresa, telefon
+    e. Cartile pot fi imprumutate de cititor: Pentru fiecare imprumut se tin urmatoarele evidente: cartea imprumutata, cititorul care a imprumutat-o, data imprumutului si data la care sa o inapoize
+Aplicate trebuie sa afiseze urmatoarele informatii:
+    1. Adaugarea de elemente in baza de date
+    2. Lista cartilor existente in biblioteca
+    3. Lista cartilor imprumutate de un cititor intr-o anumita perioada de timp(numele si limitele intervalului se citesc de la tastatura)
+    4. Lista cu cartile care apartin unui autor al carui nume se citeste de la tastatura
+    5. Lista cu cartile dintr-un domeniu de interes al carui nume se citeste de la tastatura
+    6. Lista cu cartile dintr-un domeniu de interes aparute la o editura(numele domeniului si numele editurii se citesc de la tastatura)
+    7. Lista cu cartile aparute intr-un anumit an la o editura(anul si numele edituri se citsc de la tastatura)
+*/
+
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+//--------------------------- crearea stucturilor necesare ---------------------------//
+struct domeniu_de_interes
+{
+    int cod;
+    char nume[30];
+};
+struct carte
+{
+    int cod_carte;
+    char titlu[30];
+    char autor[30];
+    char editura[30];
+    int an_aparitie;
+    int pret;
+    int cod_domeniu;
+};
+struct cititor
+{
+    int cod_cititor;
+    char nume[30];
+    char adresa[30];
+    int telefon;
+};
+struct imprumut
+{
+    int cod_carte;
+    int cod_cititor;
+    int zi_imprumut;
+	int luna_imprumut;
+	int an_imprumut;
+    int zi_restituire;
+	int luna_restituire;
+	int an_restituire;
+};
+int main()
+{
+	//--------------------------- corespunzator fiecarei structuri cream cate un vector de elemente ---------------------------//
+    struct domeniu_de_interes dom[10];
+	struct carte carte[20]; 
+	struct cititor cititor[20];
+	struct imprumut imprumut[20];
+
+	//--------------------------- declarare variabile utilizate ---------------------------//
+	int i, an, aux = 0, cititor_imprumut, transfer_cod;
+	int zi_inceput, luna_inceput, an_inceput, zi_sfarsit, luna_sfarsit, an_sfarsit;
+	char editura[30], nume[30], domeniu_dorit[30];
+
+	//--------------------------- introducere cateva date pentru verificare ---------------------------//
+	// date pentru domeniile de interes
+	int nr_domenii = 5; 
+    dom[1].cod = 1;
+    strcpy_s(dom[1].nume,30,"istorie");
+
+	dom[2].cod = 2;
+    strcpy_s(dom[2].nume,30,"chimie");
+
+	dom[3].cod = 3;
+    strcpy_s(dom[3].nume,30,"matematica");
+
+	dom[4].cod = 4;
+    strcpy_s(dom[4].nume,30,"programare");
+
+	dom[5].cod = 5;
+    strcpy_s(dom[5].nume,30,"psihologie");
+		
+	// adaugare carti
+	int nr_carti = 7;
+	carte[1].cod_carte = 1002;
+	strcpy_s(carte[1].titlu,30,"C++ for dummies");
+    strcpy_s(carte[1].autor,30,"Davis");
+	strcpy_s(carte[1].editura,30,"Wiley");
+    carte[1].an_aparitie = 2007;
+    carte[1].pret = 150;
+    carte[1].cod_domeniu = 4;
+
+	carte[2].cod_carte = 1003;
+	strcpy_s(carte[2].titlu,30,"Matematica");
+    strcpy_s(carte[2].autor,30,"Dilimot");
+	strcpy_s(carte[2].editura,30,"All");
+    carte[2].an_aparitie = 2013;
+    carte[2].pret = 20;
+    carte[2].cod_domeniu = 3;
+
+	carte[3].cod_carte = 1004;
+	strcpy_s(carte[3].titlu,30,"Ceva intelient");
+    strcpy_s(carte[3].autor,30,"Iona");
+	strcpy_s(carte[3].editura,30,"Didactica");
+    carte[3].an_aparitie = 2008;
+    carte[3].pret = 35;
+    carte[3].cod_domeniu = 5;
+
+	carte[4].cod_carte = 1005;
+	strcpy_s(carte[4].titlu,30,"Lgatura covalenta");
+    strcpy_s(carte[4].autor,30,"Cineva");
+	strcpy_s(carte[4].editura,30,"Paralela 45");
+    carte[4].an_aparitie = 1996;
+    carte[4].pret = 30;
+    carte[4].cod_domeniu = 2;
+
+	carte[5].cod_carte = 1006;
+	strcpy_s(carte[5].titlu,30,"Mari domnitori");
+    strcpy_s(carte[5].autor,30,"Whatever");
+	strcpy_s(carte[5].editura,30,"All");
+    carte[5].an_aparitie = 2003;
+    carte[5].pret = 10;
+    carte[5].cod_domeniu = 1;
+
+	carte[6].cod_carte = 1007;
+	strcpy_s(carte[6].titlu,30,"My SQL");
+    strcpy_s(carte[6].autor,30,"Micutul");
+	strcpy_s(carte[6].editura,30,"Didactica");
+    carte[6].an_aparitie = 2014;
+    carte[6].pret = 50;
+    carte[6].cod_domeniu = 4;
+
+	carte[7].cod_carte = 1008;
+	strcpy_s(carte[7].titlu,30,"Chimie organica");
+    strcpy_s(carte[7].autor,30,"Zaldoiu");
+	strcpy_s(carte[7].editura,30,"Mititica");
+    carte[7].an_aparitie = 2015;
+    carte[7].pret = 60;
+    carte[7].cod_domeniu = 2;
+
+	// cativa cititori
+	int nr_citori = 3;
+	cititor[1].cod_cititor = 956;
+	strcpy_s(cititor[1].nume,30,"Ion Denis");
+	strcpy_s(cititor[1].adresa,30,"Bd. Tineretului, nr. 2");
+	cititor[1].telefon = 22;
+   
+	cititor[2].cod_cititor = 457;
+	strcpy_s(cititor[2].nume,30,"Maria Stanculescu");
+	strcpy_s(cititor[2].adresa,30,"Str. Balonului");
+	cititor[2].telefon = 53;
+
+	cititor[3].cod_cititor = 821;
+	strcpy_s(cititor[3].nume,30,"Stancu Dan");
+	strcpy_s(cititor[3].adresa,30,"Bd. Drept, nr. 48");
+	cititor[3].telefon = 68;
+
+	// carti imprumutate
+	int nr_imprumuturi = 2;
+	imprumut[1].cod_carte = 1008;
+    imprumut[1].cod_cititor = 457;
+	imprumut[1].zi_imprumut = 20;
+	imprumut[1].luna_imprumut = 06;
+	imprumut[1].an_imprumut = 2014;
+    imprumut[1].zi_imprumut = 02;
+	imprumut[1].luna_imprumut = 07;
+	imprumut[1].an_imprumut = 2014;
+
+	imprumut[2].cod_carte = 1005;
+    imprumut[2].cod_cititor = 821;
+	imprumut[2].zi_imprumut = 28;
+	imprumut[2].luna_imprumut = 12;
+	imprumut[2].an_imprumut = 2015;
+    imprumut[2].zi_imprumut = 11;
+	imprumut[2].luna_imprumut = 01;
+	imprumut[2].an_imprumut = 2016;
+
+	//--------------------------- codul propriu-zis pentru cerintel dorite ---------------------------//
+
+	int alegere;
+	do // vom folosi un do{}  while; pentru configurarea meniului
+	{
+		cout << endl
+		<< " 1 - Adaugarea de elemente in baza de date.\n"
+		<< " 2 - Lista cartilor existente in biblioteca.\n"
+		<< " 3 - Lista cartilor imprumutate de un cititor intr-o anumita perioada de timp.\n"
+		<< " 4 - Lista cu cartile care apartin unui autor.\n"
+		<< " 5 - Lista cu cartile dintr-un domeniu de interes.\n"
+		<< " 6 - Lista cu cartile dintr-un domeniu de interes aparute la o editura, \n"
+		<< " 7 - Lista cu cartile aparute intr-un anumit an la o editura. \n"
+		<< " Selectati optiunea dorita: ";
+		cin >> alegere;
+
+		switch (alegere) // comanda switch este utilizata pentru comutarea intre optiunile meniului
+		{
+			case 1:
+				// adaugarea unui domeniu de interes
+				cout << "Introduceti codul aferent unui nou domeniu de interes: " << endl;
+				cin >> dom[nr_domenii+1].cod;
+				cout << "Introduceti numele noului domeniu: " << endl;
+				cin >> dom[nr_domenii+1].nume;
+				nr_domenii++;
+				cout << "Felicitari! Ati adaugat un nou domeniu de interes!" << endl;
+				cout << endl;
+
+				// adaugarea unei noi carti in biblioteca
+				cout << "Introduceti codul cartii pe care o adaugati: "<< endl;
+				cin >> carte[nr_carti+1].cod_carte;
+				cout << "Introduceti codul domeniului caruia va apartine: "<< endl;
+				cin >> carte[nr_carti+1].cod_domeniu;
+				cout << "Introduceti titlul cartii: "<< endl;
+				cin >> carte[nr_carti+1].titlu;
+				cout << "Introduceti autorul cartii: "<< endl;
+				cin >> carte[nr_carti+1].autor;
+				cout << "Introduceti editura care a publicat cartea: " << endl;
+				cin >> carte[nr_carti+1].editura;
+				cout << "Introduceti anul aparitiei: "<< endl;
+				cin >> carte[nr_carti+1].an_aparitie;
+				cout << "Introduceti pretul aferent acesteia: " << endl;
+				cin >> carte[nr_carti+1].pret;				
+				nr_carti++;
+				cout << "Felicitari! Ati adaugat o noua carte!" << endl;
+				cout << endl;
+
+				// adaugarea unui nou cititor
+				cout << "Introduceti codul noului cititor: " << endl;
+				cin >> cititor[nr_citori+1].cod_cititor;
+				cout << "Introduceti numele cititorului: " << endl; // recomand sa aiba doar un nume, nu si prenume(asta pentru tine)
+				cin >> cititor[nr_citori+1].nume;
+				cout << "Introduceti adresa acestuia: " << endl; // si aici sa pui tot un cuvant ca e posibil sa faca figuri la citire
+				cin >> cititor[nr_citori+1].adresa;
+				cout << "Introduceti numarul de telefon: " << endl;
+				cin >> cititor[nr_citori+1].telefon;
+				nr_citori++;
+				cout << "Felicitari! Ati adaugat un nou cititor!" << endl;
+				cout << endl;
+				// agaugarea unui imprumut nou
+				cout << "Introduceti codul cartii ce urmeaza sa fie imprumutata: " << endl;
+				cin >> imprumut[nr_imprumuturi+1].cod_carte;
+				cout << "Introduceti codul cititorului dornic sa citeasca: " << endl;
+				cin >> imprumut[nr_imprumuturi+1].cod_cititor;
+				cout << "Introduceti ziua imprumutului: " << endl;
+				cin >> imprumut[nr_imprumuturi+1].zi_imprumut;
+				cout << "Introduceti luna imprumutului: " << endl;
+				cin >> imprumut[nr_imprumuturi+1].luna_imprumut;
+				cout << "Introduceti anul imprumutului: " << endl;
+				cin >> imprumut[nr_imprumuturi+1].an_imprumut;
+				cout << "Introduceti ziua viitoarei restituiri: " << endl;
+				cin >> imprumut[nr_imprumuturi+1].zi_restituire;
+				cout << "Introduceti luna viitoarei restituiri: " << endl;
+				cin >> imprumut[nr_imprumuturi+1].luna_restituire;
+				cout << "Introduceti anul viitoarei restituiri: " << endl;
+				cin >> imprumut[nr_imprumuturi+1].an_restituire;
+				nr_imprumuturi++;
+				cout << "Felicitari! Ati adaugat un nou imprumut!" << endl;
+				cout << endl;
+				
+
+				break;
+			case 2:
+				cout << "Cartile existente in biblioteca sunt: " << endl;
+				for(i=1; i<=nr_carti; i++)
+				{
+					cout << carte[i].cod_carte << " --- " << carte[i].titlu << ", autor " << carte[i].autor << ", editura " << carte[i].editura << ", " << carte[i].an_aparitie << endl;
+				}
+				cout << endl;
+				break;
+			case 3:
+				cout << "Introduceti codul cititorului pentru care doriti imprumuturile: " << endl;
+				cin >> cititor_imprumut;
+				cout << "Introduceti inceputul intervalulul de timp pentru care se cauta imprumuturile: " << endl << "(zi luna an, va rog apasati enter dupa fiecare)" << endl;
+				cin >> zi_inceput >> luna_inceput >> an_inceput;
+				cout << "Introduceti sfarsitul intervalului de timp: " << endl;
+				cin >> zi_sfarsit >> luna_sfarsit >> an_sfarsit;
+				cout << "Imprumuturile existente in baza de date sunt: " << endl;
+				for(i=1; i<=nr_imprumuturi; i++)
+				{
+					if(imprumut[i].cod_cititor == cititor[i].cod_cititor)  
+						if(imprumut[i].an_imprumut > an_inceput && imprumut[i].an_imprumut < an_sfarsit) 
+							if(imprumut[i].luna_imprumut > luna_inceput && imprumut[i].luna_imprumut < luna_sfarsit)
+								if(imprumut[i].zi_imprumut > zi_inceput && imprumut[i].zi_imprumut < zi_sfarsit)
+									{
+										cout << imprumut[i].cod_carte << " --- " << imprumut[i].cod_cititor << endl;
+										aux++;
+									}
+				}
+				if (aux == 0)
+						cout << "In perioada introdusa cititorul " << cititor_imprumut <<" nu a imprumutat nicio carte.";
+				cout << endl;
+				break;
+			case 4:
+				cout << "Introduceti numele unui autor: " << endl;
+				cin >> nume;
+				aux = 0;
+				cout << "Cartile care apartin autorului introdus sunt: " << endl;
+				for(i=1; i<=nr_carti; i++)
+					if(strcmp(carte[i].autor, nume) == 1)
+						{
+							cout << carte[i].titlu << endl;
+							aux++;
+						}
+				if (aux == 0)
+						cout << "Autorul nu are nicio carte in biblioteca";
+				cout << endl;
+				break;
+			case 5:
+				cout << "Domeniile existente in biblioteca sunt: " << endl;
+				for(i=1; i<=nr_domenii; i++)
+				{
+					cout << dom[i].cod << " --- " << dom[i].nume << endl;
+				}
+				cout << endl;
+				cout << "Introduceti codul domeniului dorit: " << endl;
+				cin >> transfer_cod;
+				
+				aux = 0;
+				cout << "Cartile care apartin domeniului ales sunt: " <<endl;
+				for(i=1; i<=nr_carti; i++)
+					if(carte[i].cod_domeniu == transfer_cod)
+					{
+						cout << carte[i].titlu << endl;
+						aux++;
+					}
+				if (aux == 0)
+					cout << "In biblioteca nu exista carti care sa apartina domeniului ales";
+				cout << endl;
+				break;
+			case 6:
+				cout << "Introduceti numele unei edituri: " << endl;
+				cin >> editura;
+				cout << "Domeniile existente in biblioteca sunt: " << endl;
+				for(i=1; i<=nr_domenii; i++)
+				{
+					cout << dom[i].cod << " --- " << dom[i].nume << endl;
+				}
+				cout << endl;
+				cout << "Introduceti codul domeniului dorit: " << endl;
+				cin >> transfer_cod;
+				for(i=1; i<=nr_carti; i++)
+					if(carte[i].cod_domeniu == transfer_cod && strcmp(carte[i].editura, editura) == 1)
+					{
+						cout << carte[i].titlu << endl;
+						aux++;
+					}
+				if (aux == 0)
+					cout << "In biblioteca nu exista carti din acest domeniu aparute la editura " << editura;
+				cout << endl;
+				break;
+			case 7:
+				cout << "Introduceti numele unei edituri: " << endl;
+				cin >> editura;
+				cout << "Introduceti un an: " << endl;
+				cin >> an;
+
+				aux = 0;
+				for(i=1; i<=nr_carti; i++)
+					if((carte[i].an_aparitie == an) && (strcmp(carte[i].editura, editura) == 1))
+					{
+						cout << carte[i].titlu << endl;
+						aux++;
+					}
+				if (aux == 0)
+					cout << "Nu exista carti de la editura " << editura << " publicate in " << an;
+				cout << endl;
+				break;
+			default:
+				cout << "Optiunea aleasa nu este valida. \n"
+					<< "Alegeti inca o data. \n";
+				break;
+		}		
+	} while (alegere != 8); // meniul are doar 7 posibilitati valibile
+	
+	system("PAUSE");
+    return 0;
+}
+	
